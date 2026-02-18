@@ -1,0 +1,23 @@
+CHIP UnsignedCompare16 {
+    IN x[16], y[16];
+    OUT lt, eq, gt;
+
+    PARTS:
+    
+    ALU(x=x, y=y, zx=false, nx=false, zy=false, ny=true, f=true, no=true,
+        out=diff, zr=eq, ng=neg);
+
+    
+    Xor(a=x[15], b=y[15], out=msbDiff);
+
+    Not(in=x[15], out=nx15);
+    And(a=nx15, b=y[15], out=ltWhenMsbDiff);
+    
+    Not(in=msbDiff, out=msbSame);
+    And(a=msbSame, b=neg, out=ltWhenMsbSame);
+
+    Or(a=ltWhenMsbDiff, b=ltWhenMsbSame, out=lt);
+
+    Or(a=lt, b=eq, out=le);
+    Not(in=le, out=gt);
+}
