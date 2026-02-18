@@ -1,0 +1,64 @@
+CHIP SatAddSub16 {
+    IN x[16], y[16], op;     
+    OUT out[16], ovf;
+
+    PARTS:
+    
+    ALU(x=x, y=y,
+        zx=false, nx=false,
+        zy=false, ny=op,
+        f=true,  no=op,
+        out=res, zr=zr, ng=ng);
+
+
+    Xor(a=x[15], b=y[15], out=sxXorSy);
+    Xor(a=res[15], b=x[15], out=srXorSx);
+
+    Not(in=sxXorSy, out=sxEqSy);
+
+    And(a=sxEqSy,  b=srXorSx, out=ovAdd);
+    And(a=sxXorSy, b=srXorSx, out=ovSub);
+    Mux(a=ovAdd, b=ovSub, sel=op, out=ovf);
+
+    Not(in=false, out=t);
+
+    
+    And(a=t, b=t, out=posMax[0]);
+    And(a=t, b=t, out=posMax[1]);
+    And(a=t, b=t, out=posMax[2]);
+    And(a=t, b=t, out=posMax[3]);
+    And(a=t, b=t, out=posMax[4]);
+    And(a=t, b=t, out=posMax[5]);
+    And(a=t, b=t, out=posMax[6]);
+    And(a=t, b=t, out=posMax[7]);
+    And(a=t, b=t, out=posMax[8]);
+    And(a=t, b=t, out=posMax[9]);
+    And(a=t, b=t, out=posMax[10]);
+    And(a=t, b=t, out=posMax[11]);
+    And(a=t, b=t, out=posMax[12]);
+    And(a=t, b=t, out=posMax[13]);
+    And(a=t, b=t, out=posMax[14]);
+    And(a=false, b=false, out=posMax[15]); 
+
+    
+    And(a=false, b=false, out=negMin[0]);
+    And(a=false, b=false, out=negMin[1]);
+    And(a=false, b=false, out=negMin[2]);
+    And(a=false, b=false, out=negMin[3]);
+    And(a=false, b=false, out=negMin[4]);
+    And(a=false, b=false, out=negMin[5]);
+    And(a=false, b=false, out=negMin[6]);
+    And(a=false, b=false, out=negMin[7]);
+    And(a=false, b=false, out=negMin[8]);
+    And(a=false, b=false, out=negMin[9]);
+    And(a=false, b=false, out=negMin[10]);
+    And(a=false, b=false, out=negMin[11]);
+    And(a=false, b=false, out=negMin[12]);
+    And(a=false, b=false, out=negMin[13]);
+    And(a=false, b=false, out=negMin[14]);
+    And(a=t, b=t, out=negMin[15]);         
+
+    Mux16(a=posMax, b=negMin, sel=x[15], out=sat);
+    
+    Mux16(a=res, b=sat, sel=ovf, out=out);
+}
